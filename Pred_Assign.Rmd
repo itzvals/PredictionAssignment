@@ -1,0 +1,77 @@
+---
+title: "Prediction Assignment Writeup"
+author: "I V"
+date: "2024-07-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+#load libraries
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(caret)
+library(randomForest)
+library(bst)
+library(plyr)
+library(party)
+```
+
+The goal of this project is to predict the manner in which people did the exercise.
+
+Load the data
+```{r}
+train <- read.csv('/Users/itzelvalencia/Documents/Research/projects/datasciencecoursera/data/pml-training.csv',na.strings=c("NA","#DIV/0!","")) 
+test <- read.csv('/Users/itzelvalencia/Documents/Research/projects/datasciencecoursera/data/pml-testing.csv',na.strings=c("NA","#DIV/0!",""))
+```
+
+remove NA
+```{r}
+train <- train %>%
+  select_if(function(col) sum(is.na(col)) / nrow(train) < 0.95) %>%
+  select(-c(X, user_name, raw_timestamp_part_1, raw_timestamp_part_2, cvtd_timestamp, new_window, num_window))
+```
+Split the training into 80/20 train and test based on classe
+
+```{r}
+set.seed(245)
+intrain <- createDataPartition(y=train$classe, p=0.6, list = FALSE)
+training<-train[intrain, ]
+testing <- train[-intrain, ]
+```
+
+Train the model/predict on the testing
+
+```{r}
+#model1
+set.seed(369)
+bst_model <- train(classe~., data = training, method = 'bstTree')
+bst_model
+#predict on testing data for bst
+bst_pred<- predict(bst_model, testing)
+table(bst_pred)
+#ensure factors for confusion matrix
+testing$classe <- factor(testing$classe, levels = c("A", "B", "C", "D", "E"))
+levels(bst_pred)
+levels(testing$classe)
+#Confusion matrix 
+conf_test_bst <- confusionMatrix(bst_pred, testing$classe)
+conf_test_bst
+#model2
+set.seed(452)
+rf_model <- train(classe~., data = training, method = 'rf')
+rf_model
+#predict on testing data for rf
+rf_pred<- predict(rf_model, testing)
+table(rf_pred)
+#Confusion matrix 
+conf_test_rf <- confusionMatrix(rf_pred, testing$classe)
+conf_test_rf
+```
+Use rf (best prediction model) to predict 20 different test cases.
+```{r}
+final_pred <- predict(rf_model, testing) 
+```
+
+
+
