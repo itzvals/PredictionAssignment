@@ -32,16 +32,13 @@ train <- train %>%
   select(-c(X, user_name, raw_timestamp_part_1, raw_timestamp_part_2, cvtd_timestamp, new_window, num_window))
 ```
 Split the training into 80/20 train and test based on classe
-
 ```{r}
 set.seed(245)
 intrain <- createDataPartition(y=train$classe, p=0.6, list = FALSE)
 training<-train[intrain, ]
 testing <- train[-intrain, ]
 ```
-
 Train the model/predict on the testing
-
 ```{r}
 #model1
 set.seed(369)
@@ -68,7 +65,12 @@ table(rf_pred)
 conf_test_rf <- confusionMatrix(rf_pred, testing$classe)
 conf_test_rf
 ```
-Use rf (best prediction model) to predict 20 different test cases.
+Cross validation
+```{r}
+expected_error <- conf_test_rf$overall['Accuracy']
+cat("The expected sample error for the RF model is estimated to be", (1 - expected_error) * 100, "% accuracy.")
+```
+Use RF (best prediction model) to predict 20 different test cases.
 ```{r}
 final_pred <- predict(rf_model, testing) 
 ```
