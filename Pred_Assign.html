@@ -511,7 +511,11 @@ conf_test_rf</code></pre>
 ## Detection Rate         0.2840   0.1918   0.1717   0.1607   0.1824
 ## Detection Prevalence   0.2854   0.1949   0.1755   0.1614   0.1829
 ## Balanced Accuracy      0.9981   0.9938   0.9900   0.9899   0.9959</code></pre>
-<p>Use rf (best prediction model) to predict 20 different test
+<p>Cross validation</p>
+<pre class="r"><code>expected_error &lt;- conf_test_rf$overall[&#39;Accuracy&#39;]
+cat(&quot;The expected sample error for the RF model is estimated to be&quot;, (1 - expected_error) * 100, &quot;% accuracy.&quot;)</code></pre>
+<pre><code>## The expected sample error for the RF model is estimated to be 0.9431557 % accuracy.</code></pre>
+<p>Use RF (best prediction model) to predict 20 different test
 cases.</p>
 <pre class="r"><code>final_pred &lt;- predict(rf_model, testing) </code></pre>
 
